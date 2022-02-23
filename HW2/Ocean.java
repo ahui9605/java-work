@@ -7,15 +7,17 @@ import java.util.Collections;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 /**
+ * @author Zehui Liu
+ * @date February 22, 2022
  *
- * @author leoli
+ * This is the ocean class that generate a particular area of ocean to allow
+ * fisherman to fish. Ocean generates limited number of fish and resources.
  */
 import java.util.Random;
 
 public class Ocean {
 
     private ArrayList<FishableItem> oceanList;
-    ArrayList<Integer> record = new ArrayList();
 
     public Ocean() {
         this.oceanList = new ArrayList<>();
@@ -23,8 +25,7 @@ public class Ocean {
     }
 
     /**
-     * This method will automatically add specific number of fishes into the
-     * ocean, oceanList
+     * This method will automatically add some fish in the oceanList
      *
      */
     public void addFishes() {
@@ -36,7 +37,6 @@ public class Ocean {
             if (i < 20) {
                 this.oceanList.add(new Salmon());
             }
-
             if (i < 15) {
                 this.oceanList.add(new TropicalFish());
             }
@@ -44,12 +44,13 @@ public class Ocean {
                 this.oceanList.add(new GoldenCod());
             }
         }
+        // shuffle for providing "randomness" in the oceanList.
+        Collections.shuffle(oceanList);
     }
 
     /**
      * This method will generate a random number as an index number to determine
-     * which fish can give to fisherman in the ArrayList oceanList. It will
-     * shuffle fishes first and let randomNum to pick
+     * which fish can give to fisherman in an ArrayList, oceanList.
      *
      * @return pop, return a fish from randomNum picked.
      */
@@ -58,29 +59,8 @@ public class Ocean {
 
         //random number depends on the size of the oceanList make sure it is not out of bound index
         int randomNum = rand.nextInt(oceanList.size() - 1);
-
-        //fish are constantly moving, User shuffle to keep the fishes index moving around.
-        Collections.shuffle(oceanList);
         FishableItem fish = oceanList.get(randomNum);
         oceanList.remove(randomNum);
         return fish;
     }
-
-    public ArrayList<FishableItem> getOceanList() {
-        return oceanList;
-    }
 }
-
-//    public boolean randomNumUsed(int randomNum) {
-//        for (int i = 0; i < record.size(); i++) {
-//            if (record.get(i) == randomNum) {
-//                return true;
-//            } else if (record.get(i) != randomNum) {
-//                record.add(randomNum);
-//                return false;
-//            }
-//        }
-//        return false;
-////    }
-//
-

@@ -2,10 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
 /**
- *
- * @author leoli
+ * @author Zehui Liu
+ * @date February 22, 2022 
+ * A subclass inherits from FishableItem class
  */
 public class GoldenCod extends FishableItem {
 

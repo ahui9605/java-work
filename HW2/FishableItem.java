@@ -4,24 +4,26 @@
  */
 
 /**
+ * @author Zehui Liu
+ * @date February 22, 2022
  *
- * @author leoli
+ * An abstract class included some abstract methods that can be override by
+ * other fish classes.
  */
 public abstract class FishableItem {
 
     protected String name;
     protected int points;
 
-    public FishableItem() {
+    protected FishableItem() {
 
     }
 
-    public FishableItem(String name, int points) {
+    protected FishableItem(String name, int points) {
         this.name = name;
         this.points = points;
     }
 
-    //abstract method that can be override by other fish classes.
     public abstract void getName();
 
     public abstract void getPoints();

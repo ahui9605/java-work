@@ -4,8 +4,9 @@
  */
 
 /**
- *
- * @author leoli
+ * @author Zehui Liu
+ * @date February 22, 2022 
+ * A subclass inherits from FishableItem class
  */
 public class Boot extends FishableItem {
 
