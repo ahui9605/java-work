@@ -28,7 +28,7 @@ public class lab08 extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        String selection[] = {"Binary", "Hexadecimal"};
+        String selection[] = {"Binary", "Octal", "Hexadecimal"};
         ComboBox combo_box = new ComboBox(FXCollections.observableArrayList(selection));
 
         hbox.setPadding(new Insets(15, 15, 15, 15));
@@ -77,6 +77,9 @@ public class lab08 extends Application {
             } else if (currentSelection.equals("Hexadecimal")) {
                 int hexadecimalInt = Integer.parseInt(originalNum.getText());
                 convertedNum.setText(hexadecimalConvert(hexadecimalInt));
+            } else if (currentSelection.equals("Octal")) {
+                int octalInt = Integer.parseInt(originalNum.getText());
+                convertedNum.setText(octalConvert(octalInt));
             }
         } catch (NumberFormatException e) {
             convertedNum.setText("empty value");
@@ -116,4 +119,19 @@ public class lab08 extends Application {
         System.out.println("hexadecimal: " + result);
         return result;
     }
+
+    private String octalConvert(int originalNum) {
+        int number = 0;
+        String result = "";
+        char[] octalList = {'0', '1', '2', '3', '4', '5', '6', '7', '8'};
+
+        while (originalNum > 0) {
+            number = originalNum % 8;
+            result = octalList[number] + result;
+            originalNum = originalNum / 8;
+        }
+        System.out.println("octal: " + result);
+        return result;
+    }
 }
+
