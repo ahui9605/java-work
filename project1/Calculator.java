@@ -20,10 +20,11 @@ import javafx.stage.Stage;
 public class Calculator extends Application {
     //initialize data and class
     private double memory = 0;
-    private double memory1 = 0;
+    private double memory2 = 0;
     private int operator = -1;
     private boolean dotted = false;
     private boolean secondInput = false;
+    private boolean secondOperator = false;
 
     GridPane gp = new GridPane();
     TextField tf = new TextField();
@@ -85,10 +86,12 @@ public class Calculator extends Application {
         trigonometry_sqrt(tf, COS, "cos");
         trigonometry_sqrt(tf, SQT, "sqrt");
 
+        //"." and "C" button
         dotActionEvent();
         clearActionEvent();
 
-        equal();
+        //"=" button
+        equalActionEvent();
 
         // Create a scene and place it in the stage
         Scene scene = new Scene(result, 250, 154);
@@ -98,25 +101,23 @@ public class Calculator extends Application {
     }
 
     /**
-     * A method to control the clear button action on the calculator
+     * A method to control the clear button action in the calculator
      **/
     private void clearActionEvent() {
 
         EventHandler<ActionEvent> clear = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-
                 //when a clear button clicked, remove everything included all values and actions from previous calculation
                 memory = 0;
-                memory1 = 0;
+                memory2 = 0;
                 dotted = false;
                 operator = -1;
                 secondInput = false;
+                secondOperator = false;
 
                 //empty the display number
                 tf.setText("");
-
-                System.out.println("all clear from clear handler: " + memory + ", " + memory1 + ", " + dotted + ", " + operator);
             }
         };
         //clear button action set
@@ -124,11 +125,10 @@ public class Calculator extends Application {
     }
 
     /**
-     * A method to control the dot button action on the calculator
+     * A method to control the dot button action in the calculator
      **/
-    private void dotActionEvent() throws NumberFormatException {
-
-        EventHandler<ActionEvent> dot = new EventHandler<ActionEvent>() {
+    private void dotActionEvent() {
+        EventHandler<ActionEvent> dotEvent = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 //no more than 1 dot appear on the textfield
@@ -142,87 +142,122 @@ public class Calculator extends Application {
             }
         };
         //dot button action set
-        DOT.setOnAction(dot);
+        DOT.setOnAction(dotEvent);
     }
 
+    /**
+     * A method to control the sin,cos and sqrt button action in the calculator
+     **/
     private void trigonometry_sqrt(TextField tf, Button bt, String display) {
-        EventHandler<ActionEvent> event = new EventHandler<ActionEvent>() {
+        EventHandler<ActionEvent> trig_sqrtEvent = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                //catch exception from empty value
                 try {
                     memory = Double.parseDouble(tf.getText());
                 } catch (NumberFormatException empty_value) {
-                    tf.setText("Error(empty value");
+                    tf.setText("Error(empty value/invalid input");
                 }
 
-                double number = 0;
+                //do the math calculation after clicking the button
+                double trig_sqrtNumber = 0;
                 if (display.equals("sin")) {
-                    number = Math.sin(memory);
+                    trig_sqrtNumber = Math.sin(memory);
                 } else if (display.equals("cos")) {
-                    number = Math.cos(memory);
+                    trig_sqrtNumber = Math.cos(memory);
                 } else if (display.equals("sqrt")) {
-                    number = Math.sqrt(memory);
+                    trig_sqrtNumber = Math.sqrt(memory);
                 }
 
-
-                if (memory % 1 == 0 && number % 1 == 0) {
-                    int number1 = (int) number;
-                    tf.setText(String.valueOf(number1));
+                //convert to integer if the number is not decimal number
+                if (memory % 1 == 0 && trig_sqrtNumber % 1 == 0) {
+                    int intNumber = (int) trig_sqrtNumber;
+                    tf.setText(String.valueOf(intNumber));
                 } else {
-                    tf.setText(String.valueOf(number));
+                    tf.setText(String.valueOf(trig_sqrtNumber));
                 }
             }
-
         };
-        bt.setOnAction(event);
+        //sin, cos and sqrt button action set
+        bt.setOnAction(trig_sqrtEvent);
     }
 
     /**
-     * A method to control the operators' action on the calculator
+     * A method to control the operators' action in the calculator
      **/
     private void operatorActionEvent(TextField tf, Button bt, String display) {
 
-        EventHandler<ActionEvent> event = new EventHandler<ActionEvent>() {
+        EventHandler<ActionEvent> operatorEvent = new EventHandler<ActionEvent>() {
             @Override
 
             public void handle(ActionEvent actionEvent) {
                 try {
-                    secondInput = true;
-                    memory = Double.parseDouble(tf.getText());
-                    System.out.println("operator button clicked, memory from number Action record: " + memory);
-                    if (display.equals("+")) {
-                        operator = 1;
-                        dotted = false;
-                    } else if (display.equals("-")) {
-                        operator = 2;
-                        dotted = false;
-                    } else if (display.equals("*")) {
-                        operator = 3;
-                        dotted = false;
-                    } else if (display.equals("/")) {
-                        operator = 4;
-                        dotted = false;
+                    //allow user to continue to do the calculation when clicking operator button
+                    if (secondOperator) {
+                        secondInput = true;
+                        memory2 = Double.parseDouble(tf.getText());
+                        System.out.println("memory2 from operator action: " + memory2);
+
+                        //check the operator
+                        if (operator == 1) {
+                            memory = memory + memory2;
+                        } else if (operator == 2) {
+                            memory = memory - memory2;
+                        } else if (operator == 3) {
+                            memory = memory * memory2;
+                        } else if (operator == 4) {
+                            memory = memory / memory2;
+                        }
+
+                        System.out.println("memory:" + memory);
+                        System.out.println("memory2:" + memory2);
+                    } else {
+                        //save the number into the first memory and clear the number,then do the second input
+                        memory = Double.parseDouble(tf.getText());
+                        secondInput = true;
                     }
+                    //catch exception
                 } catch (NumberFormatException empty_values) {
-                    tf.setText("Error(empty value)");
+                    tf.setText("Error(empty value/invalid input)");
+                }
+
+                //check which button is clicked by the user
+                if (display.equals("+")) {
+                    operator = 1;
+                    dotted = false;
+                    secondOperator = true;
+                } else if (display.equals("-")) {
+                    operator = 2;
+                    dotted = false;
+                    secondOperator = true;
+                } else if (display.equals("*")) {
+                    operator = 3;
+                    dotted = false;
+                    secondOperator = true;
+                } else if (display.equals("/")) {
+                    operator = 4;
+                    dotted = false;
+                    secondOperator = true;
                 }
             }
         };
 
-        bt.setOnAction(event);
+        bt.setOnAction(operatorEvent);
     }
 
     /**
-     * A method to control the numeric button's action on the calculator
+     * A method to control the numeric button's action in calculator
      **/
     private void numberActionEvent(TextField tf, Button bt, String display) {
         EventHandler<ActionEvent> numberEvent = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                //clear the first input number
                 if (secondInput) {
                     tf.setText("");
                     secondInput = false;
                 }
+
                 tf.setText(tf.getText() + display);
             }
         };
@@ -230,81 +265,81 @@ public class Calculator extends Application {
     }
 
     /**
-     * A method to control the equal button action on the calculator
+     * A method to control the equal button action in calculator
      **/
-    private void equal() {
-        EventHandler<ActionEvent> equal = new EventHandler<ActionEvent>() {
+    private void equalActionEvent() {
+        EventHandler<ActionEvent> equalEvent = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 try {
                     //converting the second number to the double number entered by the user
-                    memory1 = Double.parseDouble(tf.getText());
-                    System.out.println("memory1 from operator action: " + memory1);
-
-                    //check which operator did user clicked
-                    switch (operator) {
-                        case 1:
-                            //check if the user did not enter any decimal number or dot
-                            if ((memory + memory) % 1 == 0) {
-                                //force to convert the result into integer with no decimal place
-                                int addNumber = (int) memory + (int) memory1;
-                                //add value and display it on the GUI textfield
-                                tf.setText(String.valueOf(addNumber));
-                            } else {
-                                //display the decimal number on the GUI textfield
-                                tf.setText(String.valueOf(memory + memory1));
-                            }
-                            break;
-                        case 2:
-                            if ((memory - memory1) % 1 == 0) {
-                                int minusNumber = (int) memory - (int) memory1;
-                                tf.setText(String.valueOf(minusNumber));
-                            } else {
-                                tf.setText(String.valueOf(memory - memory1));
-                            }
-                            break;
-                        case 3:
-                            if ((memory * memory1) % 1 == 0) {
-                                int multiplyNumber = (int) memory * (int) memory1;
-                                tf.setText(String.valueOf(multiplyNumber));
-                            } else {
-                                tf.setText(String.valueOf(memory * memory1));
-                            }
-                            break;
-                        case 4:
-                            if ((memory / memory1) % 1 == 0) {
-                                int divideNumber = (int) memory / (int) memory1;
-                                tf.setText(String.valueOf(divideNumber));
-                            } else {
-                                tf.setText(String.valueOf(memory / memory1));
-                            }
-                            break;
-                        default:
-                            tf.setText("Error");
-                            System.out.println("Error");
-                            break;
-                    }
-                    //stop the calculation when user inputs a number divide by zero
+                    memory2 = Double.parseDouble(tf.getText());
+                    switchStatement(operator, memory, memory2);
+                    memory2 = 0;
+                    secondOperator = false;
+                    secondInput = false;
                 } catch (ArithmeticException divide_by_zero) {
-                    //inform the user why the program stops the calculation
+                    //stop the calculation when user inputs a number divide by zero
                     tf.setText("Cannot divide by zero");
                     //stop the calculation when user clicks operator buttons without numeric value
                 } catch (NumberFormatException empty_value) {
-                    //inform the user why the program stops the calculation
-                    tf.setText("Error(empty value)");
+                    tf.setText("Error(empty value/invalid input)");
                 }
             }
         };
-
         //equal button action set
-        EQU.setOnAction(equal);
+        EQU.setOnAction(equalEvent);
+    }
+
+    public void switchStatement(int operator, double firstMemory, double secondMemory) {
+        //check which operator did user clicked
+        switch (operator) {
+            case 1:
+                //check if the user did not enter any decimal number or dot
+                if ((firstMemory + secondMemory) % 1 == 0) {
+                    //force to convert the result into integer with no decimal place
+                    int addNumber = (int) firstMemory + (int) secondMemory;
+                    //add value and display it on the GUI textfield
+                    tf.setText(String.valueOf(addNumber));
+                } else {
+                    //display the decimal number on the GUI textfield
+                    tf.setText(String.valueOf(firstMemory + secondMemory));
+                }
+                break;
+            case 2:
+                if ((firstMemory - secondMemory) % 1 == 0) {
+                    int minusNumber = (int) firstMemory - (int) secondMemory;
+                    tf.setText(String.valueOf(minusNumber));
+                } else {
+                    tf.setText(String.valueOf(firstMemory - secondMemory));
+                }
+                break;
+            case 3:
+                if ((firstMemory * secondMemory) % 1 == 0) {
+                    int multiplyNumber = (int) firstMemory * (int) secondMemory;
+                    tf.setText(String.valueOf(multiplyNumber));
+                } else {
+                    tf.setText(String.valueOf(firstMemory * secondMemory));
+                }
+                break;
+            case 4:
+                if ((firstMemory / secondMemory) % 1 == 0) {
+                    int divideNumber = (int) firstMemory / (int) secondMemory;
+                    tf.setText(String.valueOf(divideNumber));
+                } else {
+                    tf.setText(String.valueOf(firstMemory / secondMemory));
+                }
+                break;
+            default:
+                System.out.println("Error");
+                break;
+        }
     }
 
     /**
      * A method to display the numbers and calculation on the window
      **/
     private void textField() {
-
         tf.setEditable(false);
         tf.setAlignment(Pos.BOTTOM_RIGHT);
 
@@ -315,8 +350,8 @@ public class Calculator extends Application {
 
         //Add Gridpane in the BorderPane so it can appear on the screen
         result.setCenter(gp);
-
     }
+
 
     /**
      * A method to add buttons' location in the pane
